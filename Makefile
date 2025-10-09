@@ -17,7 +17,7 @@ build: generate
 	@mkdir -p $(BIN_DIR)
 	@go build -o $(BIN) ./cmd/main.go
 
-run: build
+run:
 	@sudo ./$(BIN)
 
 clean:
