@@ -117,7 +117,11 @@ int firewall_filter(struct __sk_buff *skb) {
     // 포트 추출
     __u16 sport = 0;
     __u16 dport = 0;
-    void *l4_hdr = (void *)ip + sizeof(*ip);
+
+    __u8 ihl = ip->ihl;
+    __u32 ip_hdr_len = ihl * 4;
+    void *l4_hdr = (void *)ip + ip_hdr_len;
+
     if (ip->protocol == IPPROTO_TCP) {
         struct tcphdr *tcp = l4_hdr;
         if ((void *)(tcp + 1) > data_end)
@@ -134,8 +138,8 @@ int firewall_filter(struct __sk_buff *skb) {
     
     // 패킷 방향 결정
     __u8 direction = (skb->ingress_ifindex != 0) ? DIR_INBOUND : DIR_OUTBOUND;
-    // Inbound는 dport, Outbound는 sport 검사
-    __u16 check_port = (direction == DIR_INBOUND) ? dport : sport;
+    __u16 check_port = dport;
+
     __u32 src_ip = ip->saddr;
     __u32 dst_ip = ip->daddr;
     __u8 protocol = ip->protocol;
